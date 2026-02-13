@@ -2,38 +2,36 @@
 
 Custom workspace templates for OpenClaw AI agents.
 
-## What This Is
+## Structure
 
-Template files that configure the initial workspace and behavior of OpenClaw bots. These templates define how bots introduce themselves, what personality traits they have, and how they interact with users.
+```
+templates.json          # Manifest fetched by claw-deployer at runtime
+templates/
+  default/BOOTSTRAP.md  # Blank Slate — open-ended self-discovery
+  productivity/BOOTSTRAP.md  # Productivity Pro — task-focused assistant
+```
 
-## Available Templates
+## How It Works
 
-- **BOOTSTRAP.md** - First conversation script and self-discovery prompts
-- **IDENTITY.md** - Bot identity and role definition
-- **USER.md** - User information template
-- **SOUL.md** - Core values and boundaries
-- **AGENTS.md** - Agent instructions and behavior guidelines
-- **TOOLS.md** - Available tools and capabilities
-- **HEARTBEAT.md** - Status and activity tracking
+When a user deploys a bot via claw-deployer, they choose a template. The deployer passes the template ID to the pod as `BOOTSTRAP_TEMPLATE`. On first boot, `entrypoint.sh` clones this repo and copies files from the chosen template subfolder into `~/.openclaw/`.
 
-All files are optional. Missing templates will use OpenClaw defaults.
+## Adding a Template
+
+1. Create a new folder under `templates/` (e.g. `templates/creative/`)
+2. Add a `BOOTSTRAP.md` (and any other `.md`/`.json` config files)
+3. Add an entry to `templates.json` with `id`, `name`, `emoji`, and `description`
 
 ## File Format
 
-Templates use Markdown format. You can optionally include frontmatter for metadata:
+Templates use Markdown with optional frontmatter:
 
 ```markdown
 ---
-version: 1.0
+title: "BOOTSTRAP.md"
+summary: "First-run ritual"
 ---
 
 # Your Content Here
 ```
 
-## Customization
-
-Edit any template file to customize bot behavior:
-- Modify the personality and tone
-- Change initial conversation prompts
-- Adjust available tools and features
-- Define custom values and boundaries
+All files are optional. Missing templates fall back to `default`, then to repo root (legacy compatibility).

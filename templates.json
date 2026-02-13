@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "default",
+      "name": "Blank Slate",
+      "emoji": "\ud83e\udde0",
+      "description": "Start from scratch \u2014 discover your bot's personality together."
+    },
+    {
+      "id": "coder",
+      "name": "Coder",
+      "emoji": "\ud83d\udcbb",
+      "description": "A coding-focused assistant for writing, debugging, and reviewing code."
+    }
+  ]
+}
