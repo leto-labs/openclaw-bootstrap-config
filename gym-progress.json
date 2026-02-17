@@ -1,0 +1,18 @@
+{
+  "mode": "gym",
+  "currentLevel": 1,
+  "unlockedLevels": [1],
+  "achievements": {
+    "messagesExchanged": 0,
+    "memoryEntriesCreated": 0,
+    "skillsInstalled": 0,
+    "tasksCompleted": 0,
+    "researchTasksCompleted": 0,
+    "proactiveSuggestionsAccepted": 0,
+    "multiToolTasksCompleted": 0,
+    "deepContextDemonstrations": 0,
+    "workflowsCompleted": 0,
+    "identityDefined": false
+  },
+  "startDate": null
+}
