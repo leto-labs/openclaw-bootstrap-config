@@ -12,6 +12,18 @@
       "name": "Coder",
       "emoji": "\ud83d\udcbb",
       "description": "A coding-focused assistant for writing, debugging, and reviewing code."
+    },
+    {
+      "id": "creator",
+      "name": "Creator",
+      "emoji": "\ud83c\udfa8",
+      "description": "A marketing and content creation assistant for campaigns, copy, video, and social media."
+    },
+    {
+      "id": "assistant",
+      "name": "Assistant",
+      "emoji": "\ud83d\udcca",
+      "description": "A personal productivity assistant for task management, memory, summarization, and staying organized."
     }
   ]
 }
