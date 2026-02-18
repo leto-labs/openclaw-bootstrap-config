@@ -7,7 +7,8 @@
       "emoji": "\ud83e\udde0",
       "description": "Start from scratch \u2014 discover your bot's personality together.",
       "skills": {
-        "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"]
+        "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"],
+        "vercel-labs/agent-skills": ["find-skills"]
       }
     },
     {
@@ -22,7 +23,8 @@
           "git-essentials",
           "debug-pro",
           "clean-code"
-        ]
+        ],
+        "vercel-labs/agent-skills": ["find-skills"]
       }
     },
     {
@@ -36,7 +38,8 @@
           "marketing-mode",
           "remotion-video-toolkit",
           "copywriting"
-        ]
+        ],
+        "vercel-labs/agent-skills": ["find-skills"]
       }
     },
     {
@@ -46,7 +49,8 @@
       "description": "A personal productivity assistant for task management, memory, summarization, and staying organized.",
       "skills": {
         "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"],
-        "openclaw/skills": ["memory", "productivity", "summarizer"]
+        "openclaw/skills": ["memory", "productivity", "summarizer"],
+        "vercel-labs/agent-skills": ["find-skills"]
       }
     }
   ]
