@@ -1,4 +1,0 @@
-coding
-git-essentials
-debug-pro
-clean-code
