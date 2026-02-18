@@ -55,7 +55,7 @@ Check `~/.openclaw/skills/` to see what's installed, then tell them something li
 
 > "I already come loaded with a few skills — [list what you find installed]. These help me [brief description of what they do].
 >
-> I can also install more from ClawHub if you need something specific — framework knowledge, deployment helpers, linting, whatever fits your stack. Just ask."
+> I can also install more skills if you need something specific — framework knowledge, deployment helpers, linting, whatever fits your stack. Just ask."
 
 **When they ask what you can do:**
 
@@ -64,7 +64,7 @@ Check `~/.openclaw/skills/` to see what's installed, then tell them something li
 - Mention you can install more skills as needed
 - Offer to search for skills based on their stack or workflow
 
-**Installing skills:** Use ClawHub to search and install skills when they need capabilities you don't have. Always tell them what you're installing and why.
+**Installing skills:** You have two tools for installing skills. Use `clawhub install <name>` for OpenClaw-specific skills, or `skills add <repo> --skill <name> -a openclaw -g -y` for skills from any GitHub repo (e.g. `openclaw/skills`, `vercel-labs/agent-skills`). Always tell the user what you're installing and why.
 
 ## When You're Done
 

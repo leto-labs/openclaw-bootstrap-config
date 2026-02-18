@@ -28,7 +28,7 @@ When a user deploys a bot via claw-deployer, they choose a template. The deploye
 
 1. Create a new folder under `templates/` (e.g. `templates/creative/`)
 2. Add a `BOOTSTRAP.md` (and any other `.md`/`.json` config files)
-3. Optionally add a `skills.txt` to pre-install skills from ClawHub (one slug per line)
+3. Optionally add a `skills.txt` to pre-install skills from [openclaw/skills](https://github.com/openclaw/skills) (one slug per line)
 4. Add an entry to `templates.json` with `id`, `name`, `emoji`, and `description`
 
 ## File Format
@@ -48,7 +48,7 @@ All files are optional. Missing templates fall back to `default`.
 
 ## Pre-installing Skills
 
-Add a `skills.txt` to any template to pre-install skills from ClawHub on first boot — one slug per line:
+Add a `skills.txt` to any template to pre-install skills from [openclaw/skills](https://github.com/openclaw/skills) on first boot — one slug per line:
 
 ```
 coding
@@ -56,21 +56,20 @@ git-essentials
 debug-pro
 ```
 
-Skills are installed via `clawhub install`. If a skill fails to install, it's skipped and the bot continues booting normally.
+Skills are installed via `npx skills add openclaw/skills --skill <name> -a openclaw`. If a skill fails to install, it's skipped and the bot continues booting normally.
 
 ### Skills per Template
 
 | Template    | Skill                                                      | Description                                               | Requires        |
 | ----------- | ---------------------------------------------------------- | --------------------------------------------------------- | --------------- |
 | **default** | _(none)_                                                   | Blank slate — user installs skills during onboarding      |                 |
-| **coder**   | [coding](https://clawhub.ai/skills/coding)                 | Learns coding preferences from explicit feedback          | —               |
-|             | [git-essentials](https://clawhub.ai/skills/git-essentials) | Essential Git commands and workflows                      | `git`           |
-|             | [debug-pro](https://clawhub.ai/skills/debug-pro)           | 7-step debugging protocol with language-specific commands | —               |
-|             | [clean-code](https://clawhub.ai/skills/clean-code)         | Pragmatic coding standards — concise, no over-engineering | —               |
-| **creator** | [marketing-mode](https://clawhub.ai/skills/marketing-mode) | 23 marketing disciplines: strategy, psychology, SEO, CRO, ads | `node`, `npm` |
-|             | [remotion-video-toolkit](https://clawhub.ai/skills/remotion-video-toolkit) | Programmatic video creation with React and Remotion | `node`, `npm` (React, Remotion, FFmpeg installed via npm) |
-|             | [copywriting](https://clawhub.ai/skills/copywriting)       | Persuasive copy frameworks — AIDA, PAS, FAB, headlines, CTAs | —           |
-|             | [social-media-content-calendar](https://clawhub.ai/skills/social-media-content-calendar) | Content calendars with platform-specific posts and scheduling | — |
-| **assistant** | [memory](https://clawhub.ai/skills/memory)                 | Long-term memory — storage, retrieval, and maintenance patterns | —               |
-|             | [productivity](https://clawhub.ai/skills/productivity)       | Adaptive productivity coaching — energy management, time blocking, boundaries | —   |
-|             | [summarizer](https://clawhub.ai/skills/summarizer)           | Content distillation — audience-aware compression and format selection | —          |
+| **coder**   | [coding](https://github.com/openclaw/skills/tree/main/skills/ivangdavila/coding)                 | Learns coding preferences from explicit feedback          | —               |
+|             | [git-essentials](https://github.com/openclaw/skills/tree/main/skills/arnarsson/git-essentials) | Essential Git commands and workflows                      | `git`           |
+|             | [debug-pro](https://github.com/openclaw/skills/tree/main/skills/cmanfre7/debug-pro)           | 7-step debugging protocol with language-specific commands | —               |
+|             | [clean-code](https://github.com/openclaw/skills/tree/main/skills/gabrielsubtil/clean-code)         | Pragmatic coding standards — concise, no over-engineering | —               |
+| **creator** | [marketing-mode](https://github.com/openclaw/skills/tree/main/skills/thesethrose/marketing-mode) | 23 marketing disciplines: strategy, psychology, SEO, CRO, ads | `node`, `npm` |
+|             | [remotion-video-toolkit](https://github.com/openclaw/skills/tree/main/skills/shreefentsar/remotion-video-toolkit) | Programmatic video creation with React and Remotion | `node`, `npm` (React, Remotion, FFmpeg installed via npm) |
+|             | [copywriting](https://github.com/openclaw/skills/tree/main/skills/jk-0001/copywriting)       | Persuasive copy frameworks — AIDA, PAS, FAB, headlines, CTAs | —           |
+| **assistant** | [memory](https://github.com/openclaw/skills/tree/main/skills/ivangdavila/memory)                 | Long-term memory — storage, retrieval, and maintenance patterns | —               |
+|             | [productivity](https://github.com/openclaw/skills/tree/main/skills/ivangdavila/productivity)       | Adaptive productivity coaching — energy management, time blocking, boundaries | —   |
+|             | [summarizer](https://github.com/openclaw/skills/tree/main/skills/ivangdavila/summarizer)           | Content distillation — audience-aware compression and format selection | —          |
