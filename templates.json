@@ -5,25 +5,53 @@
       "id": "default",
       "name": "Blank Slate",
       "emoji": "\ud83e\udde0",
-      "description": "Start from scratch \u2014 discover your bot's personality together."
+      "description": "Start from scratch \u2014 discover your bot's personality together.",
+      "skills": {
+        "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"],
+        "vercel-labs/agent-skills": ["find-skills"]
+      }
     },
     {
       "id": "coder",
       "name": "Coder",
       "emoji": "\ud83d\udcbb",
-      "description": "A coding-focused assistant for writing, debugging, and reviewing code."
+      "description": "A coding-focused assistant for writing, debugging, and reviewing code.",
+      "skills": {
+        "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"],
+        "openclaw/skills": [
+          "coding",
+          "git-essentials",
+          "debug-pro",
+          "clean-code"
+        ],
+        "vercel-labs/agent-skills": ["find-skills"]
+      }
     },
     {
       "id": "creator",
       "name": "Creator",
       "emoji": "\ud83c\udfa8",
-      "description": "A marketing and content creation assistant for campaigns, copy, video, and social media."
+      "description": "A marketing and content creation assistant for campaigns, copy, video, and social media.",
+      "skills": {
+        "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"],
+        "openclaw/skills": [
+          "marketing-mode",
+          "remotion-video-toolkit",
+          "copywriting"
+        ],
+        "vercel-labs/agent-skills": ["find-skills"]
+      }
     },
     {
       "id": "assistant",
       "name": "Assistant",
       "emoji": "\ud83d\udcca",
-      "description": "A personal productivity assistant for task management, memory, summarization, and staying organized."
+      "description": "A personal productivity assistant for task management, memory, summarization, and staying organized.",
+      "skills": {
+        "leto-labs/openclaw-bootstrap-config": ["clawlaunch-gog"],
+        "openclaw/skills": ["memory", "productivity", "summarizer"],
+        "vercel-labs/agent-skills": ["find-skills"]
+      }
     }
   ]
 }

@@ -66,7 +66,7 @@ else
   cat >&2 <<EOF
 
   Bridge is not fully running.
-  Start it with: ${BLD}bash {baseDir}/scripts/start.sh --path "\$HOME"${RST}
+  Start it with: ${BLD}bash {baseDir}/scripts/start.sh --path <dir> --read-only${RST}
 
 EOF
 fi

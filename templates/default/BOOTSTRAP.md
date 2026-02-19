@@ -63,7 +63,7 @@ Explain to them:
 - Mention you can install more skills as needed
 - Offer to search for skills based on their interests or needs
 
-**Installing skills:** Use ClawHub to search and install skills when they need capabilities you don't have. Always tell them what you're installing and why.
+**Installing skills:** You have two tools for installing skills. Use `clawhub install <name>` for OpenClaw-specific skills, or `skills add <repo> --skill <name> -a openclaw -g -y` for skills from any GitHub repo (e.g. `openclaw/skills`, `vercel-labs/agent-skills`). Always tell the user what you're installing and why.
 
 ## When You're Done
 

@@ -31,10 +31,12 @@ metadata:
 File bridge: user's devices ↔ agent workspace via WebDAV + Cloudflare Tunnel.
 
 Start
-- **Before starting, ask the user:** read-only or full read-write access?
-- `bash {baseDir}/scripts/start.sh --path "$HOME/workspace"`
-- Add `--read-only` if user chose read-only
-- Prints tunnel URL + credentials. **Give all three to the user.**
+- **Before starting, ask the user:** which directory to share, and read-only (default) or read-write?
+- `bash {baseDir}/scripts/start.sh --path "$HOME/workspace" --read-only`
+- **Default to `--read-only`** unless the user explicitly requests write access.
+- If the user requests write access, warn them: files uploaded by remote users will be readable by the agent, which creates an indirect prompt-injection risk. Only enable write access for trusted connections.
+- Omit `--read-only` only if the user confirms they understand the risk.
+- The script prints the tunnel URL and credentials to stderr. **Do NOT repeat the password in chat.** Instead, tell the user to copy the credentials from the terminal output, or run `bash {baseDir}/scripts/status.sh` to see them again.
 - `--port 9090` custom port (default 8080)
 - `--user alice --pass secret` custom credentials (default: bridge / auto-generated)
 - First positional arg = `--path` for convenience
@@ -57,8 +59,17 @@ How the user connects (tell them)
 - Enter username and password when prompted
 
 Manual install (if brew is unavailable)
-- rclone: `curl -fsSL https://rclone.org/install.sh | bash` or download from https://rclone.org/downloads/
-- cloudflared: download from https://github.com/cloudflare/cloudflared/releases/latest
+- rclone: download the binary for your platform from the official releases page, verify the checksum, and place it in your PATH
+- cloudflared: download the binary for your platform from the official releases page, verify the checksum, and place it in your PATH
+- On Debian/Ubuntu: `sudo apt install rclone` and `sudo apt install cloudflared`
+- On Arch: `sudo pacman -S rclone cloudflared`
+
+Security
+- **Never serve `$HOME` or `/`.** Only serve the specific project or workspace directory the user requests.
+- **Default to read-only.** Write access lets remote users place files the agent may later read (indirect prompt injection).
+- **Do not echo credentials in chat.** The start script prints them to stderr; direct the user there or to `status.sh`.
+- Credentials and state are stored owner-only (mode 700/600) in the runtime directory.
+- Always stop the bridge when the user is done — tunnels are publicly reachable.
 
 Notes
 - Tunnel URL changes on every restart (free Cloudflare quick tunnel).

@@ -12,13 +12,15 @@ err()   { echo "${RED}error${RST} $*" >&2; }
 # ── Runtime state directory (never writes inside the skill dir) ─
 RUNTIME_DIR="${DESKTOP_BRIDGE_DIR:-${TMPDIR:-/tmp}/desktop-bridge}"
 mkdir -p "$RUNTIME_DIR"
+chmod 700 "$RUNTIME_DIR"
 
 # ── Defaults ────────────────────────────────────────────────────
 WORKSPACE=""
 PORT=8080
 USERNAME="bridge"
 PASSWORD=""
-READ_ONLY=false
+READ_ONLY=true
+WRITE_EXPLICITLY_SET=false
 
 # ── Argument parsing ───────────────────────────────────────────
 usage() {
@@ -26,11 +28,12 @@ usage() {
 Usage: start.sh [OPTIONS] [PATH]
 
 Options:
-  --path <dir>     Directory to serve (default: \$HOME)
+  --path <dir>     Directory to serve (required)
   --port <n>       Local WebDAV port (default: 8080)
   --user <name>    WebDAV username (default: bridge)
   --pass <secret>  WebDAV password (default: auto-generated)
-  --read-only      Mount as read-only
+  --read-only      Mount as read-only (default)
+  --read-write     Allow uploads and modifications (use with caution)
   -h, --help       Show this help
 
 The first positional argument is treated as --path for backward compatibility.
@@ -45,6 +48,7 @@ while [[ $# -gt 0 ]]; do
     --user)       USERNAME="$2"; shift 2 ;;
     --pass)       PASSWORD="$2"; shift 2 ;;
     --read-only)  READ_ONLY=true; shift ;;
+    --read-write) READ_ONLY=false; WRITE_EXPLICITLY_SET=true; shift ;;
     -h|--help)    usage ;;
     -*)           err "Unknown option: $1"; usage ;;
     *)            # backward compat: first positional arg = --path
@@ -57,7 +61,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-WORKSPACE="${WORKSPACE:-$HOME}"
+if [[ -z "$WORKSPACE" ]]; then
+  err "No workspace path specified. Use --path <dir> to set the directory to serve."
+  err "Refusing to default to \$HOME — this would expose sensitive files (SSH keys, credentials, etc.)."
+  exit 1
+fi
 
 # ── Already running? ───────────────────────────────────────────
 if [[ -f "$RUNTIME_DIR/rclone.pid" ]]; then
@@ -88,7 +96,11 @@ WORKSPACE="$(cd "$WORKSPACE" 2>/dev/null && pwd)" || {
   err "Directory does not exist: ${WORKSPACE}"
   exit 1
 }
-info "Serving: $WORKSPACE"
+if [[ "$READ_ONLY" == true ]]; then
+  info "Serving: $WORKSPACE (read-only)"
+else
+  warn "Serving: $WORKSPACE (READ-WRITE — remote users can upload/modify files)"
+fi
 
 # ── Port availability check ───────────────────────────────────
 port_in_use=false
@@ -186,13 +198,20 @@ fi
 ok "Tunnel established"
 
 # ── Save state ────────────────────────────────────────────────
+# Restrict runtime directory to owner-only access
+chmod 700 "$RUNTIME_DIR"
+
 echo "$RCLONE_PID"  > "$RUNTIME_DIR/rclone.pid"
 echo "$CF_PID"      > "$RUNTIME_DIR/cloudflared.pid"
 echo "$TUNNEL_URL"  > "$RUNTIME_DIR/tunnel-url"
-echo "$USERNAME"    > "$RUNTIME_DIR/username"
-echo "$PASSWORD"    > "$RUNTIME_DIR/password"
 echo "$WORKSPACE"   > "$RUNTIME_DIR/workspace"
 echo "$PORT"        > "$RUNTIME_DIR/port"
+
+# Credential files get restrictive permissions (owner read/write only)
+install -m 600 /dev/null "$RUNTIME_DIR/username"
+echo "$USERNAME" > "$RUNTIME_DIR/username"
+install -m 600 /dev/null "$RUNTIME_DIR/password"
+echo "$PASSWORD" > "$RUNTIME_DIR/password"
 
 # ── Connection instructions (stderr) ─────────────────────────
 HOST="${TUNNEL_URL#https://}"
