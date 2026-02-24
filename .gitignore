@@ -4,3 +4,5 @@ repocache/*
 # END repocache bootstrap
 
 .env
+.firecrawl/
+skills/google-apis/discovery/
