@@ -1,6 +1,6 @@
 # OpenClaw Bootstrap Config
 
-Custom workspace templates for OpenClaw AI agents.
+Custom workspace templates for OpenClaw AI agents **and** a shared skill repository.
 
 ## Structure
 
@@ -18,7 +18,23 @@ templates/
   assistant/
     BOOTSTRAP.md        # Assistant — personal productivity assistant
     skills.txt          # Skills to pre-install (one slug per line)
+
+skills/                 # Local skills authored in this repo
+  bitwarden-secrets/
+  clawlaunch-gog/
+  desktop-bridge/
+  repocache/
+
+.agents/skills/         # All active skills (remote + symlinked local)
+skills-lock.json        # Lock file tracking remote skills only
 ```
+
+## Skills
+
+This repo acts as both a **skill aggregator** (remote third-party skills) and a **skill author workspace** (our own local skills). See [AGENTS.md](AGENTS.md) for full details.
+
+- **Remote skills** are installed via the Skills CLI into `.agents/skills/` and tracked in `skills-lock.json`.
+- **Local skills** live in `skills/` and are symlinked into `.agents/skills/` to make them available to Claude/Cursor.
 
 ## How It Works
 
