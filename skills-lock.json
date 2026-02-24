@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "skills": {
+    "cloudflare": {
+      "source": "dmmulroy/cloudflare-skill",
+      "sourceType": "github",
+      "computedHash": "931e4ab8337b629b1cdee3faecae6929abb714e912bf51ab2aea693f0f6fc908"
+    },
+    "context7": {
+      "source": "intellectronica/agent-skills",
+      "sourceType": "github",
+      "computedHash": "fccbea654f8e35824a8bdce3e059e206efeb6c1fab9f6c096c3867e761081983"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "6412eb4eb3b91595ebab937f0c69501240e7ba761b3d82510b5cf506ec5c7adc"
+    },
+    "firecrawl": {
+      "source": "firecrawl/cli",
+      "sourceType": "github",
+      "computedHash": "3ce33e7cb4f910d091dd8d5b62e89567885cf7d08faadec529bb6c16a876ff3c"
+    },
+    "gastown": {
+      "source": "numman-ali/n-skills",
+      "sourceType": "github",
+      "computedHash": "8bc368732260ec6cbf1899c13cdcdb6629f285fb64131bea94bebf8c05975796"
+    },
+    "gog": {
+      "source": "openclaw/openclaw",
+      "sourceType": "github",
+      "computedHash": "e428c2ff5b716ac41da72c3218ddf494b0b47f1997f03d21677097d7f07fd12d"
+    },
+    "goplaces": {
+      "source": "openclaw/openclaw",
+      "sourceType": "github",
+      "computedHash": "733246a4bba4984113bfeb87129c544f88c921b273ccf91280a6e3e1217227b1"
+    },
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "computedHash": "a2ebe92433006ce81bbdcfe24984663678bbbb20991a3686e34814de1097c44c"
+    },
+    "skill-creator": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "a096b9af85c9d954374ebe3f7a23b5b7737ed3f35fe2a8f5893742c4e00dba1c"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "4365be772fd3b41994a72ad478472c6d680678e7f3859860ab010e9c46e48ee0"
+    }
+  }
+}
