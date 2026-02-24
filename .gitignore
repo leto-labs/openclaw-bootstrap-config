@@ -1,0 +1,6 @@
+# BEGIN repocache bootstrap
+repocache/*
+!repocache/repocache.json
+# END repocache bootstrap
+
+.env

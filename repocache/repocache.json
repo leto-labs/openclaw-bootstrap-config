@@ -1,0 +1,9 @@
+{
+  "resources": [
+    {
+      "name": "twenty",
+      "url": "https://github.com/twentyhq/twenty",
+      "path": "twentyhq/twenty"
+    }
+  ]
+}

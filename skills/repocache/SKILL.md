@@ -1,180 +1,153 @@
 ---
 name: repocache
-description: Research external libraries/frameworks by querying locally cloned repos. Two workflows — (1) configure and clone resources, (2) search cloned source. Use when the user asks about external library APIs, patterns, or usage that may differ from training data. Triggers on "how does X work in <library>", "check the <library> source", "add repocache for <package>", "repocache", when referencing a GitHub URL for research, or when needing up-to-date source-first answers about configured resources. No external CLI dependencies — uses only git and built-in agent tools. Works with any agent (Claude Code, Cursor, OpenCode).
+description: Research external libraries/frameworks by querying locally cloned repos, and bootstrap a missing `repocache/` workspace. Use when asked to inspect third-party source, answer "how does X work in <library>", add a package/repo to repocache, or set up repocache in a new project. Keeps static scripts in the skill and dynamic repo data in local `./repocache/`.
 ---
 
 # repocache
 
-Query locally cloned repositories for up-to-date, source-first answers about external libraries. Resources use npm package names as identifiers for easy mapping from `package.json` dependencies.
+Use `repocache/` as a local mirror of third-party repositories so answers come from source code, not model memory.
 
-```
+## What lives where
+
+```text
+skills/repocache/scripts/
+├── bootstrap_repocache.sh   # initialize local repocache workspace
+└── clone.sh                 # sync script (static, bundled with skill)
+
+.gitignore                   # root ignore rules for repocache clones
+
 repocache/
-├── repocache.json      (resource config — tracked)
-├── clone.sh            (sync script — tracked)
-└── <org>/<repo>/       (shallow clones by git org/repo — gitignored, deduplicated)
+├── repocache.json      # tracked config
+└── <org>/<repo>/       # cloned repositories
 ```
 
-Multiple npm packages from the same git repo (e.g., `@trpc/server` and `@trpc/client` both from `trpc/trpc`) share a single clone. The `searchPath` field narrows focus to the relevant package within the monorepo.
+If `repocache/` or `repocache/repocache.json` is missing, bootstrap first.
 
----
+## Quick workflow
 
-## Part 1: Configuration & Cloning
+1. Bootstrap `repocache/` if needed.
+2. Add/update a resource in `repocache/repocache.json`.
+3. Run the bundled `skills/repocache/scripts/clone.sh` to clone or update repositories.
+4. Search cloned source with `rg`, `Glob`, `SemanticSearch`, and `Read`.
+5. Refine config entries when you learn repo layout details.
 
-Two entry points depending on what the user provides. Both follow the same pattern: **get a URL, clone, inspect, configure**.
+## 1) Bootstrap when missing
 
-### Workflow A: GitHub URL
-
-User provides a URL like `https://github.com/org/repo` or `git@github.com:org/repo.git`.
-
-1. **Clone** the repo immediately:
-   ```bash
-   git clone --depth 1 <url> repocache/<org>/<repo>
-   ```
-   For HTTPS URLs, the clone script automatically retries with SSH if HTTPS fails.
-
-2. **Discover package name** — inspect the clone:
-   ```bash
-   # Single-package repo
-   cat repocache/<org>/<repo>/package.json   # read "name" field
-   # Monorepo
-   ls repocache/<org>/<repo>/packages/
-   cat repocache/<org>/<repo>/packages/*/package.json
-   ```
-   - Single-package repo → use `name` from root `package.json`
-   - Monorepo → prompt the user which package(s) are relevant, or infer from the project's `package.json` dependencies
-   - Not an npm package (tool, docs site, reference) → use the repo name (e.g., `better-context`)
-
-3. **Find a release tag**:
-   ```bash
-   git ls-remote --tags <url> | sort -V | tail -5
-   ```
-
-4. **Find searchPath** — inspect the directory structure:
-   - Monorepo: set to the relevant package dir (e.g., `packages/server`)
-   - Single-package: set to `src` if it exists
-
-5. **Add entry** to `repocache/repocache.json` with all discovered info and `notes`.
-
-### Workflow B: npm Package Name
-
-User references a package from `package.json` or by npm name.
-
-1. **Resolve git URL**:
-   ```bash
-   npm view <package-name> repository.url
-   # Strip git+ prefix and .git suffix
-   ```
-   If `npm view` fails or returns no repository, use web search to find the GitHub URL.
-   For private repos, use the SSH URL (`git@github.com:org/repo.git`) directly — or use HTTPS and let the clone script fall back to SSH automatically.
-
-2. **Find a release tag** before cloning:
-   ```bash
-   npm view <package-name> version
-   # e.g., 4.7.0 → look for tag v4.7.0
-   git ls-remote --tags <url> | grep "v4.7"
-   ```
-   - Stable release → use matching tag (e.g., `v4.7.0`)
-   - Beta/canary release → use `beta` or `canary` branch
-   - No suitable tag → use `main`
-
-3. **Add a minimal entry** to `repocache/repocache.json` (name + url + tag):
-   ```json
-   {
-     "name": "@trpc/server",
-     "url": "https://github.com/trpc/trpc",
-     "tag": "v11.9.0"
-   }
-   ```
-
-4. **Clone**: `cd repocache && ./clone.sh @trpc/server`
-
-5. **Inspect the clone** to discover searchPath and notes:
-   ```bash
-   ls repocache/trpc/trpc/packages/
-   ```
-
-6. **Refine entry** — update with `searchPath` and `notes`:
-   ```json
-   {
-     "name": "@trpc/server",
-     "url": "https://github.com/trpc/trpc",
-     "tag": "v11.9.0",
-     "searchPath": "packages/server",
-     "notes": "Monorepo. Also contains @trpc/client (packages/client) and @trpc/react-query."
-   }
-   ```
-
-### Refining an Existing Resource
-
-When using a resource, improve its config for future searches:
-
-- **Pin `tag`** — if still on `main`, find a release tag matching the project's dependency version.
-- **Set `searchPath`** — if searching a monorepo and hitting irrelevant packages, narrow to the right subdirectory.
-- **Add `notes`** — record what you learned about the repo layout (monorepo structure, related packages, important directories).
-- **Tune `include`/`exclude`** — if default patterns return too much noise or miss important files.
-
-### Config Schema
-
-| Field        | Required | Default       | Description                                             |
-| ------------ | -------- | ------------- | ------------------------------------------------------- |
-| `name`       | Yes      |               | npm package name, or repo name if not an npm package    |
-| `url`        | Yes      |               | Git repo URL (HTTPS or SSH). HTTPS URLs automatically fall back to SSH if cloning fails (e.g., private repos). |
-| `tag`        | No       | `"main"`      | Git tag (preferred) or branch to clone                  |
-| `searchPath` | No       |               | Subdirectory to focus searches within                   |
-| `include`    | No       | from defaults | Glob patterns for relevant files                        |
-| `exclude`    | No       | from defaults | Glob patterns to skip                                   |
-| `notes`      | No       |               | Hints about repo structure for the agent                |
-| `enabled`    | No       | `false`       | Set to `true` to clone/update this resource             |
-
-### Clone Script
+Run the bundled bootstrap script:
 
 ```bash
-cd repocache && ./clone.sh              # clone/pull all resources
-cd repocache && ./clone.sh <name>       # clone/pull one resource by npm name
-cd repocache && ./clone.sh --no-update  # clone missing only, skip pulls
+bash skills/repocache/scripts/bootstrap_repocache.sh
 ```
 
-- New repos: shallow clone (`--depth 1`) for disk efficiency
-- Existing repos: `git fetch` + checkout to update
-- Deduplicates by URL within a single run (monorepo packages sharing a repo)
-- **SSH support**: SSH URLs (e.g., `git@github.com:org/repo.git`) are used directly. HTTPS URLs automatically fall back to SSH if the clone fails (useful for private repos requiring SSH keys).
+If your environment stores skills elsewhere, run the same script from that skill installation path.
 
----
+Verify:
 
-## Part 2: Searching
+```bash
+test -f repocache/repocache.json
+test -f .gitignore
+test -f skills/repocache/scripts/clone.sh
+```
 
-When answering questions about a library, search within the cloned source.
+Root `.gitignore` should include:
 
-### Search Process
+```gitignore
+repocache/*
+!repocache/repocache.json
+```
 
-1. **Find resource** — Read `repocache/repocache.json`, match by `name`.
-2. **Resolve disk path** — Extract `org/repo` from `url`. Clone lives at `repocache/<org>/<repo>/`.
-3. **Ensure cloned** — If the directory doesn't exist, run `./clone.sh <name>`.
-4. **Build search root** — Combine disk path + `searchPath`:
+Use `repocache/*` (not `repocache/`) so `repocache/repocache.json` can stay tracked.
+
+## 2) Config schema (`repocache/repocache.json`)
+
+Top level:
+
+```json
+{
+  "resources": []
+}
+```
+
+Each resource is an object with this core schema:
+
+| Field  | Required | Used by `clone.sh` | Description |
+| ------ | -------- | ------------------ | ----------- |
+| `name` | Yes      | Yes                | Lookup key used by `./clone.sh <name>` |
+| `url`  | Yes      | Yes                | Git clone URL (`https://...` or `git@...`) |
+| `path` | Yes      | Yes                | Clone destination relative to `repocache/` (usually `org/repo`) |
+
+Example:
+
+```json
+{
+  "name": "@trpc/server",
+  "url": "https://github.com/trpc/trpc.git",
+  "path": "trpc/trpc"
+}
+```
+
+Unknown fields are allowed for agent notes, but the current `clone.sh` ignores them.
+
+## 3) Add resources
+
+### Workflow A: user gives a GitHub URL
+
+1. Derive `path` from URL (`org/repo`).
+2. Choose `name`:
+   - npm package name if known (preferred), otherwise repo name.
+3. Add `{ "name", "url", "path" }` to `repocache.json`.
+4. Clone it:
+   ```bash
+   bash skills/repocache/scripts/clone.sh <name> --root repocache
    ```
-   repocache/<org>/<repo>/<searchPath>/
+
+### Workflow B: user gives an npm package name
+
+1. Resolve repository URL:
+   ```bash
+   npm view <package-name> repository.url
    ```
-5. **Search** using available tools (Grep, Glob, SemanticSearch, Read, etc.):
-   - Grep for symbols, function names, patterns
-   - Glob to find files by name
-   - Read for specific files once located
-   - Respect `include`/`exclude` patterns to filter results
-6. **Check notes** — the `notes` field often contains important context about repo layout.
+2. Normalize URL to a cloneable Git URL (HTTPS or SSH).
+3. Set `name` to the npm package name.
+4. Set `path` to `org/repo` from the URL.
+5. Add the resource and run:
+   ```bash
+   bash skills/repocache/scripts/clone.sh <package-name> --root repocache
+   ```
 
-### Subagent Strategy (when Task tool is available)
+For monorepos, multiple package names can intentionally point at the same `path`.
 
-If the agent supports spawning subagents (e.g., Claude Code Task tool, OpenCode), prefer delegating repocache searches to a subagent. This keeps the main context clean and allows parallel research.
+## 4) Clone/update commands
 
-Spawn the subagent with:
-- **Working directory**: `repocache/<org>/<repo>/<searchPath>/`
-- **Prompt**: the specific question about the library
-- **Context**: include the resource's `notes` field and any relevant `include`/`exclude` patterns
+```bash
+bash skills/repocache/scripts/clone.sh                               # sync all (default root: ./repocache)
+bash skills/repocache/scripts/clone.sh <name>                        # sync one
+bash skills/repocache/scripts/clone.sh --no-update                   # clone missing only
+bash skills/repocache/scripts/clone.sh <name> --no-update --root repocache
+REPOCACHE_DIR=./repocache bash skills/repocache/scripts/clone.sh <name>
+```
 
-When subagents are not available (e.g., Cursor), search directly in the main context using the same process above.
+Behavior:
 
-### Search Tips
+- Missing clone: `git clone --depth 1`
+- Existing clone: `git fetch` + `git pull --ff-only`
+- Missing `name`: exits with error
 
-- Start broad with Grep on the search root, then narrow to specific files.
-- For large repos, Glob first to understand file structure before reading.
-- For monorepos without `searchPath`, check `packages/` or `src/` first.
-- After a successful search, refine the resource config (Part 1) to make future searches faster.
+## 5) Search process
+
+1. Read `repocache/repocache.json` and find a matching `resources[].name`.
+2. Build repo root from `path`: `repocache/<path>/`.
+3. If missing, run `bash skills/repocache/scripts/clone.sh <name> --root repocache`.
+4. Search from repo root:
+   - `rg` for symbols/strings
+   - `Glob` for file discovery
+   - `SemanticSearch` for behavior-level questions
+   - `Read` for exact files and snippets
+5. For monorepos, narrow manually to likely subdirs (`packages/<pkg>`, `src`, etc.).
+
+## Maintenance guidance
+
+- Keep `name` stable to avoid lookup misses.
+- Prefer SSH URLs for private repos.
+- If clone/auth fails, switch URL form and retry.
+- Update entries when you discover better package naming or path mapping.
