@@ -1,5 +1,5 @@
 ---
-name: desktop-bridge
+name: webdav
 description: >
   Access agent workspace files from any device via WebDAV + Cloudflare Tunnel.
   Starts a file bridge so users can browse, upload, and download files using

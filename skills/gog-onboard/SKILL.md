@@ -1,5 +1,5 @@
 ---
-name: clawlaunch-gog
+name: gog-onboard
 description: >
   Google Workspace CLI for Gmail, Calendar, Drive, Contacts, Sheets, Docs, and Tasks.
   Use when the user asks to read/send email, check calendar, manage files in Drive,
